@@ -1,12 +1,12 @@
 
 import './App.css'
-import GameCanvas from './gameCanvas'
+
 
 function App() {
 
   return (
     <>
-     <GameCanvas/>
+      
     </>
   )
 }
