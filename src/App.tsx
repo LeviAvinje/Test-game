@@ -1,77 +1,79 @@
 import { useState } from 'react'
 import './App.css'
-import { createClient } from '@supabase/supabase-js'
 
-// Supabase config
-const supabaseUrl = 'https://obtgicxyyygzkgofrsts.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idGdpY3h5eXlnemtnb2Zyc3RzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MTAxNzAsImV4cCI6MjA2MjE4NjE3MH0.Mh-ZnA_Y6OLZWyYAUxIMUVg2Iv7a5_s3YFvhpcM3HEk'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-// Ticket type
-export type Ticket = {
-  id: number
-  created_at: string
-  context: string
-}
-
-// Insert ticket into Supabase
-async function createTicket(description: string, created_at: string) {
-  const { data, error } = await supabase
-    .from('tickets')
-    .insert([{ description, created_at }])
-
-  if (error) {
-    console.error('Error creating ticket:', error)
-    return null
-  }
-
-  return data
+type Entry = {
+  name: string
+  middle: string
+  date: string
 }
 
 function App() {
-  const [description, setDescription] = useState('')
-  const [date, setDate] = useState('')
-  const [status, setStatus] = useState('')
+  const today = new Date().toISOString().split('T')[0]
+  const [entries, setEntries] = useState<Entry[]>([])
+  const [name, setName] = useState('')
+  const [middle, setMiddle] = useState('')
+  const [date, setDate] = useState(today)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus('Sending...')
-
-    const result = await createTicket(description, date)
-
-    if (result) {
-      setStatus('Ticket created!')
-      setDescription('')
-      setDate('')
-    } else {
-      setStatus('Failed to create ticket.')
+    if (name.trim() || middle.trim()) {
+      setEntries([...entries, { name, middle, date }])
+      setName('')
+      setMiddle('')
+      setDate(today)
     }
   }
 
   return (
     <div className="App">
-      <h1>Create Ticket</h1>
+      <h1>låne ladere</h1>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Date:</label><br />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label>Description:</label><br />
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Submit Ticket</button>
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Navn"
+                  style={{ width: '80%' }}
+                />
+              </td>
+              <td>
+                <input
+                  value={middle}
+                  onChange={(e) => setMiddle(e.target.value)}
+                  placeholder="ID"
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
+              </td>
+              <td>
+                <button type="submit">Save</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </form>
-      {status && <p>{status}</p>}
+      {entries.length > 0 && (
+        <table>
+          <tbody>
+            {entries.map((entry, index) => (
+              <tr key={index}>
+                <td>{entry.name}</td>
+                <td>{entry.middle}</td>
+                <td>{entry.date}</td>
+                <td></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   )
 }
