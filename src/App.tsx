@@ -24,6 +24,10 @@ function App() {
     }
   }
 
+  const handleDelete = (index: number) => {
+    setEntries(entries.filter((_, i) => i !== index))
+  }
+
   return (
     <div className="App">
       <h1>låne ladere</h1>
@@ -33,14 +37,15 @@ function App() {
             <tr>
               <td>
                 <input
+                  className="name-input"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Navn"
-                  style={{ width: '80%' }}
                 />
               </td>
               <td>
                 <input
+                  className="middle-input"
                   value={middle}
                   onChange={(e) => setMiddle(e.target.value)}
                   placeholder="ID"
@@ -68,7 +73,11 @@ function App() {
                 <td>{entry.name}</td>
                 <td>{entry.middle}</td>
                 <td>{entry.date}</td>
-                <td></td>
+                <td>
+                  <button type="button" onClick={() => handleDelete(index)} className="delete-btn">
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
