@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { supabase } from './supabase'
+import backgroundVideo from './assets/0512.mp4'
 
 type Entry = {
   id?: number
@@ -73,6 +74,9 @@ function App() {
 
   return (
     <div className="App">
+      <video autoPlay loop muted className="background-video">
+        <source src={backgroundVideo} type="video/mp4" />
+      </video>
       <h1>Lader utlån kirkeparken</h1>
       <form onSubmit={handleSubmit}>
         <table>
