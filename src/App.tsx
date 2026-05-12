@@ -73,7 +73,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>låne ladere</h1>
+      <h1>Lader utlån kirkeparken</h1>
       <form onSubmit={handleSubmit}>
         <table>
           <tbody>
