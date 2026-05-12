@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
+import { supabase } from './supabase'
 
 type Entry = {
+  id?: number
   name: string
   middle: string
   date: string
@@ -14,18 +16,59 @@ function App() {
   const [middle, setMiddle] = useState('')
   const [date, setDate] = useState(today)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Load entries from Supabase on mount
+  useEffect(() => {
+    loadEntries()
+  }, [])
+
+  const loadEntries = async () => {
+    const { data, error } = await supabase
+      .from('entries')
+      .select('*')
+      .order('id', { ascending: false })
+
+    if (error) {
+      console.error('Error loading entries:', error)
+      return
+    }
+
+    setEntries(data || [])
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (name.trim() || middle.trim()) {
-      setEntries([...entries, { name, middle, date }])
+      const { data, error } = await supabase
+        .from('entries')
+        .insert([{ name, middle, date }])
+        .select()
+
+      if (error) {
+        console.error('Error saving entry:', error)
+        return
+      }
+
+      if (data) {
+        setEntries([...data, ...entries])
+      }
       setName('')
       setMiddle('')
       setDate(today)
     }
   }
 
-  const handleDelete = (index: number) => {
-    setEntries(entries.filter((_, i) => i !== index))
+  const handleDelete = async (id: number) => {
+    const { error } = await supabase
+      .from('entries')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting entry:', error)
+      return
+    }
+
+    setEntries(entries.filter((entry) => entry.id !== id))
   }
 
   return (
@@ -68,13 +111,17 @@ function App() {
       {entries.length > 0 && (
         <table>
           <tbody>
-            {entries.map((entry, index) => (
-              <tr key={index}>
+            {entries.map((entry) => (
+              <tr key={entry.id}>
                 <td>{entry.name}</td>
                 <td>{entry.middle}</td>
                 <td>{entry.date}</td>
                 <td>
-                  <button type="button" onClick={() => handleDelete(index)} className="delete-btn">
+                  <button
+                    type="button"
+                    onClick={() => entry.id && handleDelete(entry.id)}
+                    className="delete-btn"
+                  >
                     Delete
                   </button>
                 </td>
@@ -88,3 +135,4 @@ function App() {
 }
 
 export default App
+
