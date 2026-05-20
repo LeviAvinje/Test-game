@@ -77,7 +77,7 @@ function App() {
       <video autoPlay loop muted className="background-video">
         <source src={backgroundVideo} type="video/mp4" />
       </video>
-      <h1>Lader utlån kirkeparken</h1>
+      <h1>utlån kirkeparken</h1>
       <form onSubmit={handleSubmit}>
         <table>
           <tbody>
